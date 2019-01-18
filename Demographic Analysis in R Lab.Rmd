@@ -1,0 +1,118 @@
+---
+title: 'Lab 2: Demographic analysis in R'
+author: "Brad Anderson"
+date: "January 18, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r include=FALSE}
+library(tidyverse)
+library(popbio)
+```
+###Entering the Model
+
+**1.	Print the matrix you have just created, and ensure that it matches the one in Table 2 of Crowder et al. (1994) (linked on the GauchoSpace page)**
+
+```{r echo=FALSE}
+class_names <- c("Egg", "Sm Juv", "Lg Juv", "Subadult", "Adult")
+A <- matrix(c(0, 0, 0, 4.665, 61.896,
+0.675, 0.703, 0, 0, 0,
+0, 0.047, 0.657, 0, 0,
+0, 0, 0.019, 0.682, 0,
+0, 0, 0, 0.061, 0.809),
+nrow = 5, ncol = 5, byrow = TRUE, dimnames = list(class_names, class_names))
+
+A
+```
+
+**2.	Print out the subsets of A described in the list above. Do you get the values you expect? Do you understand how matrix subsetting works? If not, what don’t you understand? **
+```{r}
+#elements (3,3) and (4,3)
+A[3:4, 3]
+#columns 3 and 5
+A[ , c(3,5)]
+#everything except the first row.
+A[-1, ] 
+
+```
+
+**3.	From the matrix you have just created, draw the life cycle graph, putting in the values for each transition. (you can draw it by hand and paste a photo of your drawing here)**
+
+
+
+
+
+
+
+
+
+
+
+
+###Projecting the population matrix
+
+```{r}
+library(popbio) # You may need to install this first with install.packages("popbio")
+n_0 <- c(1000, 10, 10, 10, 10) # Initial abundance
+pop <- pop.projection(A, n_0, iterations = 10) # Project the matrixpop
+stage.vector.plot(pop$stage.vector) # Plot each stage through time
+```
+
+
+**4.	The output of pop.projection has a number of other elements besides stage.vector. Describe what they are.**
+```{r}
+pop
+```
+
+lambda	
+Estimate of lambda using change between the last two population counts
+stable.stage	
+Estimate of stable stage distribution using proportions in last stage vector
+stage.vector	
+A matrix with the number of projected individuals in each stage class
+pop.sizes	
+Total number of projected individuals
+pop.changes	
+Proportional change in population size
+
+
+
+5.	Plot pop$pop.sizes and pop$pop.changes through time. What do these tell you? 
+
+
+
+
+6.	Once the population has reached the stable stage distribution (SSD), all stages will grow or decline exponentially with the same growth rate. Looking at the stage vector plot, has this been achieved by the end of your simulated time series? (Tip: this might be easier to determine if you make the plot with abundance on a log scale. You can do this by including log = "y" in the call to stage.vector.plot) 
+
+
+
+
+
+7.	If the population has not reached the SSD, run the simulation for longer. How many years are required before the population appears to be at the SSD?
+
+
+
+Analyzing the Population Matrix
+8.	Compare the values of lambda and SSD with the equivalent outputs of pop.projection from the initial run (with only 10 years of simulation). Why are they different? 
+
+
+
+
+9.	You want to improve the status of the population so that it is no longer declining. You think that your best options are to manage the nesting beaches to increase egg/hatchling survival (e.g., controlling poaching, motorized vehicles, dogs, bright lights that disorient hatchlings) or to reduce the bycatch of adult turtles in shrimp trawling nets (e.g., by requiring a modified design with a “turtle excluder device” or by reducing fishing effort). Use the model to evaluate the effects of these two strategies: 
+a.	Which element of the projection matrix represents egg/hatchling survival? Which represents adult survival? 
+
+
+b.	Increase egg/hatchling survival in the model, and re-calculate λ1. By how much does it increase? Experiment with different values of this survival term until you get an asymptotic growth rate of 1 or more. How large does egg survival need to be to achieve this? 
+
+
+
+c.	Put the egg survival back to its original value, increase adult survival in the model, and re-calculate λ1. By how much does it increase? Experiment with different values of this survival term until you get an asymptotic growth rate of 1 or more. How large does adult survival need to be to achieve this? 
+
+
+
+
+d.	Based on this analysis, which life stage seems the more promising one to target management at? What else would you need to know to reach a final conclusion?
