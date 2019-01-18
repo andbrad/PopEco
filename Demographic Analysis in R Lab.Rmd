@@ -2,7 +2,9 @@
 title: 'Lab 2: Demographic analysis in R'
 author: "Brad Anderson"
 date: "January 18, 2019"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -68,51 +70,103 @@ stage.vector.plot(pop$stage.vector) # Plot each stage through time
 pop
 ```
 
-lambda	
-Estimate of lambda using change between the last two population counts
-stable.stage	
-Estimate of stable stage distribution using proportions in last stage vector
-stage.vector	
-A matrix with the number of projected individuals in each stage class
-pop.sizes	
-Total number of projected individuals
-pop.changes	
-Proportional change in population size
+lambda: The popbio package estimates lambda using the change between the last two population counts. If I ran this with enough iterations this would reach the asymptotic value.
+stable.stage: proportions of each life stage calss in last stage iteration
+stage.vector: "a matrix with the number of projected individuals in each stage class""
+pop.sizes: "Total number of projected individuals"
+pop.changes: "Proportional change in population size"
 
 
 
-5.	Plot pop$pop.sizes and pop$pop.changes through time. What do these tell you? 
+**5.	Plot pop$pop.sizes and pop$pop.changes through time. What do these tell you?**
+
+```{r}
+plot(pop$pop.sizes)
+plot(pop$pop.changes)
+```
+These shows that the number of individuals decreases after time=4.
 
 
 
+**6.	Once the population has reached the stable stage distribution (SSD), all stages will grow or decline exponentially with the same growth rate. Looking at the stage vector plot, has this been achieved by the end of your simulated time series? (Tip: this might be easier to determine if you make the plot with abundance on a log scale. You can do this by including log = "y" in the call to stage.vector.plot) **
 
-6.	Once the population has reached the stable stage distribution (SSD), all stages will grow or decline exponentially with the same growth rate. Looking at the stage vector plot, has this been achieved by the end of your simulated time series? (Tip: this might be easier to determine if you make the plot with abundance on a log scale. You can do this by including log = "y" in the call to stage.vector.plot) 
+It has not reached SSD.
 
+```{r}
 
+stage.vector.plot(pop$stage.vector, log = "y")
 
+```
 
+**7.	If the population has not reached the SSD, run the simulation for longer. How many years are required before the population appears to be at the SSD?**
 
-7.	If the population has not reached the SSD, run the simulation for longer. How many years are required before the population appears to be at the SSD?
+It takes ~20 years for the population to be at SSD.
 
+```{r}
 
+pop100 <- pop.projection(A, n_0, iterations = 100) # Project the matrixpop
+stage.vector.plot(pop100$stage.vector) # Plot each stage through time
 
-Analyzing the Population Matrix
-8.	Compare the values of lambda and SSD with the equivalent outputs of pop.projection from the initial run (with only 10 years of simulation). Why are they different? 
-
-
-
-
-9.	You want to improve the status of the population so that it is no longer declining. You think that your best options are to manage the nesting beaches to increase egg/hatchling survival (e.g., controlling poaching, motorized vehicles, dogs, bright lights that disorient hatchlings) or to reduce the bycatch of adult turtles in shrimp trawling nets (e.g., by requiring a modified design with a “turtle excluder device” or by reducing fishing effort). Use the model to evaluate the effects of these two strategies: 
-a.	Which element of the projection matrix represents egg/hatchling survival? Which represents adult survival? 
-
-
-b.	Increase egg/hatchling survival in the model, and re-calculate λ1. By how much does it increase? Experiment with different values of this survival term until you get an asymptotic growth rate of 1 or more. How large does egg survival need to be to achieve this? 
+```
 
 
+###Analyzing the Population Matrix
 
-c.	Put the egg survival back to its original value, increase adult survival in the model, and re-calculate λ1. By how much does it increase? Experiment with different values of this survival term until you get an asymptotic growth rate of 1 or more. How large does adult survival need to be to achieve this? 
+**8.	Compare the values of lambda and SSD with the equivalent outputs of pop.projection from the initial run (with only 10 years of simulation). Why are they different? **
+
+The initial run of ten years produces a lambda of 0.9211549, which is less than the actual lambda of 0.9515489. This is because not enough time was alotted for the population to reach SSD, where all stages will grow or decline at the same rate.
+
+```{r}
+lambda(A)
+
+stable.stage(A)
+
+```
 
 
 
+**9.	You want to improve the status of the population so that it is no longer declining. You think that your best options are to manage the nesting beaches to increase egg/hatchling survival (e.g., controlling poaching, motorized vehicles, dogs, bright lights that disorient hatchlings) or to reduce the bycatch of adult turtles in shrimp trawling nets (e.g., by requiring a modified design with a “turtle excluder device” or by reducing fishing effort). Use the model to evaluate the effects of these two strategies: **
 
-d.	Based on this analysis, which life stage seems the more promising one to target management at? What else would you need to know to reach a final conclusion?
+**a.	Which element of the projection matrix represents egg/hatchling survival? Which represents adult survival? **
+
+egg/hatchling survival = [2,1]
+adult survival = [5,5]
+
+
+
+**b.	Increase egg/hatchling survival in the model, and re-calculate λ1. By how much does it increase? Experiment with different values of this survival term until you get an asymptotic growth rate of 1 or more. How large does egg survival need to be to achieve this? **
+
+By increasing the egg/hatchling survival to 0.80 it increases lambda from 0.9515489 to 0.9611348.
+
+```{r}
+egg <- matrix(c(0, 0, 0, 4.665, 61.896,
+                0.8, 0.703, 0, 0, 0,
+                0, 0.047, 0.657, 0, 0,
+                0, 0, 0.019, 0.682, 0,
+                0, 0, 0, 0.061, 0.809),
+nrow = 5, ncol = 5, byrow = TRUE, dimnames = list(class_names, class_names))
+
+lambda(egg)
+```
+
+
+
+**c.	Put the egg survival back to its original value, increase adult survival in the model, and re-calculate λ1. By how much does it increase? Experiment with different values of this survival term until you get an asymptotic growth rate of 1 or more. How large does adult survival need to be to achieve this? **
+
+I need to increase the adult survival to between 0.92 and 0.93 to reach a lambda of 1.
+
+```{r}
+adult <- matrix(c(0, 0, 0, 4.665, 61.896,
+                0.675, 0.703, 0, 0, 0,
+                0, 0.047, 0.657, 0, 0,
+                0, 0, 0.019, 0.682, 0,
+                0, 0, 0, 0.061, 0.93),
+nrow = 5, ncol = 5, byrow = TRUE, dimnames = list(class_names, class_names))
+
+lambda(adult)
+```
+
+
+**d.	Based on this analysis, which life stage seems the more promising one to target management at? What else would you need to know to reach a final conclusion?**
+
+The adult life stage is more promising. Even if I set the egg survival to "1" I do not reach a lambda of 1. In order to reach a final conclusion I would need to know the feasibility of increasing adult survival. As these turtles live out at see, it would be difficult to affect adult survival. Increasing egg/hatchling survival is likely easier because it occurs on beaches where we can more easily protect them.

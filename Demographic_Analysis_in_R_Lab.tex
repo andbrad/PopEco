@@ -1,0 +1,422 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={Lab 2: Demographic analysis in R},
+            pdfauthor={Brad Anderson},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\newcommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{Lab 2: Demographic analysis in R}
+    \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+    \author{Brad Anderson}
+    \preauthor{\centering\large\emph}
+  \postauthor{\par}
+      \predate{\centering\large\emph}
+  \postdate{\par}
+    \date{January 18, 2019}
+
+
+\begin{document}
+\maketitle
+
+\subsubsection{Entering the Model}\label{entering-the-model}
+
+\textbf{1. Print the matrix you have just created, and ensure that it
+matches the one in Table 2 of Crowder et al. (1994) (linked on the
+GauchoSpace page)}
+
+\begin{verbatim}
+##            Egg Sm Juv Lg Juv Subadult  Adult
+## Egg      0.000  0.000  0.000    4.665 61.896
+## Sm Juv   0.675  0.703  0.000    0.000  0.000
+## Lg Juv   0.000  0.047  0.657    0.000  0.000
+## Subadult 0.000  0.000  0.019    0.682  0.000
+## Adult    0.000  0.000  0.000    0.061  0.809
+\end{verbatim}
+
+\textbf{2. Print out the subsets of A described in the list above. Do
+you get the values you expect? Do you understand how matrix subsetting
+works? If not, what don't you understand? }
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#elements (3,3) and (4,3)}
+\NormalTok{A[}\DecValTok{3}\OperatorTok{:}\DecValTok{4}\NormalTok{, }\DecValTok{3}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   Lg Juv Subadult 
+##    0.657    0.019
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#columns 3 and 5}
+\NormalTok{A[ , }\KeywordTok{c}\NormalTok{(}\DecValTok{3}\NormalTok{,}\DecValTok{5}\NormalTok{)]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##          Lg Juv  Adult
+## Egg       0.000 61.896
+## Sm Juv    0.000  0.000
+## Lg Juv    0.657  0.000
+## Subadult  0.019  0.000
+## Adult     0.000  0.809
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#everything except the first row.}
+\NormalTok{A[}\OperatorTok{-}\DecValTok{1}\NormalTok{, ] }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##            Egg Sm Juv Lg Juv Subadult Adult
+## Sm Juv   0.675  0.703  0.000    0.000 0.000
+## Lg Juv   0.000  0.047  0.657    0.000 0.000
+## Subadult 0.000  0.000  0.019    0.682 0.000
+## Adult    0.000  0.000  0.000    0.061 0.809
+\end{verbatim}
+
+\textbf{3. From the matrix you have just created, draw the life cycle
+graph, putting in the values for each transition. (you can draw it by
+hand and paste a photo of your drawing here)}
+
+\subsubsection{Projecting the population
+matrix}\label{projecting-the-population-matrix}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(popbio) }\CommentTok{# You may need to install this first with install.packages("popbio")}
+\NormalTok{n_}\DecValTok{0}\NormalTok{ <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{1000}\NormalTok{, }\DecValTok{10}\NormalTok{, }\DecValTok{10}\NormalTok{, }\DecValTok{10}\NormalTok{, }\DecValTok{10}\NormalTok{) }\CommentTok{# Initial abundance}
+\NormalTok{pop <-}\StringTok{ }\KeywordTok{pop.projection}\NormalTok{(A, n_}\DecValTok{0}\NormalTok{, }\DataTypeTok{iterations =} \DecValTok{10}\NormalTok{) }\CommentTok{# Project the matrixpop}
+\KeywordTok{stage.vector.plot}\NormalTok{(pop}\OperatorTok{$}\NormalTok{stage.vector) }\CommentTok{# Plot each stage through time}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Demographic_Analysis_in_R_Lab_files/figure-latex/unnamed-chunk-4-1.pdf}
+
+\textbf{4. The output of pop.projection has a number of other elements
+besides stage.vector. Describe what they are.}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{pop}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## $lambda
+## [1] 0.9211549
+## 
+## $stable.stage
+##         Egg      Sm Juv      Lg Juv    Subadult       Adult 
+## 0.211083402 0.671087214 0.108936804 0.006133496 0.002759084 
+## 
+## $stage.vectors
+##             0      1         2           3           4           5
+## Egg      1000 665.61 571.19685  485.036481  411.289802  351.626280
+## Sm Juv     10 682.03 928.75384 1038.471823 1057.445316 1021.004674
+## Lg Juv     10   7.04  36.68069   67.750644   93.320349  111.011399
+## Subadult   10   7.01   4.91458    4.048677    4.048460    4.534136
+## Adult      10   8.70   7.46591    6.339711    5.375795    4.595974
+##                   6          7          8          9
+## Egg      305.624171 271.522516 246.937023 229.398165
+## Sm Juv   955.114025 877.741474 800.329955 729.314449
+## Lg Juv   120.921709 124.335922 122.942550 118.388763
+## Subadult   5.201497   5.844934   6.348627   6.665672
+## Adult      3.994726   3.549024   3.227702   2.998477
+## 
+## $pop.sizes
+##  [1] 1040.000 1370.390 1549.012 1601.647 1571.480 1492.772 1390.856
+##  [8] 1282.994 1179.786 1086.766
+## 
+## $pop.changes
+## [1] 1.3176827 1.1303438 1.0339800 0.9811646 0.9499152 0.9317268 0.9224490
+## [8] 0.9195569 0.9211549
+\end{verbatim}
+
+lambda: The popbio package estimates lambda using the change between the
+last two population counts. If I ran this with enough iterations this
+would reach the asymptotic value. stable.stage: proportions of each life
+stage calss in last stage iteration stage.vector: ``a matrix with the
+number of projected individuals in each stage class''" pop.sizes:
+``Total number of projected individuals'' pop.changes: ``Proportional
+change in population size''
+
+\textbf{5. Plot pop\(pop.sizes and pop\)pop.changes through time. What
+do these tell you?}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{plot}\NormalTok{(pop}\OperatorTok{$}\NormalTok{pop.sizes)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Demographic_Analysis_in_R_Lab_files/figure-latex/unnamed-chunk-6-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{plot}\NormalTok{(pop}\OperatorTok{$}\NormalTok{pop.changes)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Demographic_Analysis_in_R_Lab_files/figure-latex/unnamed-chunk-6-2.pdf}
+These shows that the number of individuals decreases after time=4.
+
+\textbf{6. Once the population has reached the stable stage distribution
+(SSD), all stages will grow or decline exponentially with the same
+growth rate. Looking at the stage vector plot, has this been achieved by
+the end of your simulated time series? (Tip: this might be easier to
+determine if you make the plot with abundance on a log scale. You can do
+this by including log = ``y'' in the call to stage.vector.plot) }
+
+It has not reached SSD.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{stage.vector.plot}\NormalTok{(pop}\OperatorTok{$}\NormalTok{stage.vector, }\DataTypeTok{log =} \StringTok{"y"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Demographic_Analysis_in_R_Lab_files/figure-latex/unnamed-chunk-7-1.pdf}
+
+\textbf{7. If the population has not reached the SSD, run the simulation
+for longer. How many years are required before the population appears to
+be at the SSD?}
+
+It takes \textasciitilde{}20 years for the population to be at SSD.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{pop100 <-}\StringTok{ }\KeywordTok{pop.projection}\NormalTok{(A, n_}\DecValTok{0}\NormalTok{, }\DataTypeTok{iterations =} \DecValTok{100}\NormalTok{) }\CommentTok{# Project the matrixpop}
+\KeywordTok{stage.vector.plot}\NormalTok{(pop100}\OperatorTok{$}\NormalTok{stage.vector) }\CommentTok{# Plot each stage through time}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Demographic_Analysis_in_R_Lab_files/figure-latex/unnamed-chunk-8-1.pdf}
+
+\subsubsection{Analyzing the Population
+Matrix}\label{analyzing-the-population-matrix}
+
+\textbf{8. Compare the values of lambda and SSD with the equivalent
+outputs of pop.projection from the initial run (with only 10 years of
+simulation). Why are they different? }
+
+The initial run of ten years produces a lambda of 0.9211549, which is
+less than the actual lambda of 0.9515489. This is because not enough
+time was alotted for the population to reach SSD, where all stages will
+grow or decline at the same rate.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{lambda}\NormalTok{(A)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.9515489
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{stable.stage}\NormalTok{(A)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##         Egg      Sm Juv      Lg Juv    Subadult       Adult 
+## 0.238508404 0.647732505 0.103356123 0.007285382 0.003117586
+\end{verbatim}
+
+\textbf{9. You want to improve the status of the population so that it
+is no longer declining. You think that your best options are to manage
+the nesting beaches to increase egg/hatchling survival (e.g.,
+controlling poaching, motorized vehicles, dogs, bright lights that
+disorient hatchlings) or to reduce the bycatch of adult turtles in
+shrimp trawling nets (e.g., by requiring a modified design with a
+``turtle excluder device'' or by reducing fishing effort). Use the model
+to evaluate the effects of these two strategies: }
+
+\textbf{a. Which element of the projection matrix represents
+egg/hatchling survival? Which represents adult survival? }
+
+egg/hatchling survival = {[}2,1{]} adult survival = {[}5,5{]}
+
+\textbf{b. Increase egg/hatchling survival in the model, and
+re-calculate λ1. By how much does it increase? Experiment with different
+values of this survival term until you get an asymptotic growth rate of
+1 or more. How large does egg survival need to be to achieve this? }
+
+By increasing the egg/hatchling survival to 0.80 it increases lambda
+from 0.9515489 to 0.9611348.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{egg <-}\StringTok{ }\KeywordTok{matrix}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\FloatTok{4.665}\NormalTok{, }\FloatTok{61.896}\NormalTok{,}
+                \FloatTok{0.8}\NormalTok{, }\FloatTok{0.703}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{,}
+                \DecValTok{0}\NormalTok{, }\FloatTok{0.047}\NormalTok{, }\FloatTok{0.657}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{,}
+                \DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\FloatTok{0.019}\NormalTok{, }\FloatTok{0.682}\NormalTok{, }\DecValTok{0}\NormalTok{,}
+                \DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\FloatTok{0.061}\NormalTok{, }\FloatTok{0.809}\NormalTok{),}
+\DataTypeTok{nrow =} \DecValTok{5}\NormalTok{, }\DataTypeTok{ncol =} \DecValTok{5}\NormalTok{, }\DataTypeTok{byrow =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{dimnames =} \KeywordTok{list}\NormalTok{(class_names, class_names))}
+
+\KeywordTok{lambda}\NormalTok{(egg)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.9611348
+\end{verbatim}
+
+\textbf{c. Put the egg survival back to its original value, increase
+adult survival in the model, and re-calculate λ1. By how much does it
+increase? Experiment with different values of this survival term until
+you get an asymptotic growth rate of 1 or more. How large does adult
+survival need to be to achieve this? }
+
+I need to increase the adult survival to between 0.92 and 0.93 to reach
+a lambda of 1.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{adult <-}\StringTok{ }\KeywordTok{matrix}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\FloatTok{4.665}\NormalTok{, }\FloatTok{61.896}\NormalTok{,}
+                \FloatTok{0.675}\NormalTok{, }\FloatTok{0.703}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{,}
+                \DecValTok{0}\NormalTok{, }\FloatTok{0.047}\NormalTok{, }\FloatTok{0.657}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{,}
+                \DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\FloatTok{0.019}\NormalTok{, }\FloatTok{0.682}\NormalTok{, }\DecValTok{0}\NormalTok{,}
+                \DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\FloatTok{0.061}\NormalTok{, }\FloatTok{0.93}\NormalTok{),}
+\DataTypeTok{nrow =} \DecValTok{5}\NormalTok{, }\DataTypeTok{ncol =} \DecValTok{5}\NormalTok{, }\DataTypeTok{byrow =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{dimnames =} \KeywordTok{list}\NormalTok{(class_names, class_names))}
+
+\KeywordTok{lambda}\NormalTok{(adult)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 1.003739
+\end{verbatim}
+
+\textbf{d. Based on this analysis, which life stage seems the more
+promising one to target management at? What else would you need to know
+to reach a final conclusion?}
+
+The adult life stage is more promising. Even if I set the egg survival
+to ``1'' I do not reach a lambda of 1. In order to reach a final
+conclusion I would need to know the feasibility of increasing adult
+survival. As these turtles live out at see, it would be difficult to
+affect adult survival. Increasing egg/hatchling survival is likely
+easier because it occurs on beaches where we can more easily protect
+them.
+
+
+\end{document}
