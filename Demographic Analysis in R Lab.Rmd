@@ -3,8 +3,8 @@ title: 'Lab 2: Demographic analysis in R'
 author: "Brad Anderson"
 date: "January 18, 2019"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -43,18 +43,18 @@ A[-1, ]
 ```
 
 **3.	From the matrix you have just created, draw the life cycle graph, putting in the values for each transition. (you can draw it by hand and paste a photo of your drawing here)**
-
-
-
-
-
-
-
-
-
-
-
-
+<br>  
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
 ###Projecting the population matrix
 
 ```{r}
