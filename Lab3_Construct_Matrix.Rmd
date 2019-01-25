@@ -1,0 +1,45 @@
+---
+title: "Lab 3 - Constructing Matrix Models"
+author: "Brad Anderson"
+date: "January 25, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+### Using mpmtools to construct matrix population models
+
+# Install and load the package
+devtools::install_github("brucekendall/mpmtools")
+library(mpmtools)
+
+# Look at the sea turtle datasets
+loggerhead
+?loggerhead
+
+# Recreate the Crowder et al matrix
+make_stage4age_matrix(loggerhead[[2]], approx_method = "AAS")
+#Allows you touse different models, in this case the AAS - asymptotic age structure
+
+# Explore other options
+
+
+# If you know the maturation rates (g or gamma), can use make_Lefkovitch_matrix
+
+# For an age-structured model, can use make_Leslie_matrix
+```
+
+```{r}
+make_stage4age_matrix(loggerhead[[2]], approx_method = "FAS")
+```
+
+```{r}
+#What if you want a pre-breeding census model?
+make_stage4age_matrix(loggerhead[[2]], approx_method = "AAS", model = "pre")
+
+#Fertility coefficient now has the newborn survival rather than the adult survival.
+```
+
