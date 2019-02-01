@@ -1,0 +1,46 @@
+---
+title: "Northern Spotted Owl"
+author: "Brad Anderson"
+date: "January 31, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r include=FALSE}
+library(tidyverse)
+library(popbio)
+library(mpmtools)
+```
+
+```{r}
+
+class_names <- c("Juvenile", "Subadult", "Adult")
+A <- matrix(c(0, 0, 0.24,
+              0.108, 0, 0,
+              0, 0.71, 0.94),
+            nrow = 3, ncol = 3, byrow = TRUE, dimnames=list(class_names, class_names))
+```
+
+```{r}
+n_0 <- c(1000, 10, 10) # Initial abundance
+pop <- pop.projection(A, n_0, iterations = 10) # Project the matrixpop
+stage.vector.plot(pop$stage.vector) # Plot each stage through time
+```
+
+```{r}
+lambda(A)
+
+stable.stage(A)
+```
+
+
+```{r}
+demog_sched <- data.frame(x = 0:2,
+                          sx = c(0.108, 0.71, 0.94),
+                          mx = c(0,0,0.24))
+  make_Leslie_matrix(demog_sched, model = "post")
+```
+
