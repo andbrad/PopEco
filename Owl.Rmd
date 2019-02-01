@@ -41,6 +41,6 @@ stable.stage(A)
 demog_sched <- data.frame(x = 0:2,
                           sx = c(0.108, 0.71, 0.94),
                           mx = c(0,0,0.24))
-  make_Leslie_matrix(demog_sched, model = "post")
+  make_Leslie_matrix(demog_sched, model = "pre")
 ```
 
