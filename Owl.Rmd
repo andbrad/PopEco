@@ -17,15 +17,14 @@ library(mpmtools)
 
 ```{r}
 
-class_names <- c("Juvenile", "Subadult", "Adult")
-A <- matrix(c(0, 0, 0.24,
-              0.108, 0, 0,
-              0, 0.71, 0.94),
-            nrow = 3, ncol = 3, byrow = TRUE, dimnames=list(class_names, class_names))
+class_names <- c("Subadult", "Adult")
+A <- matrix(c(0, 0.024432,
+              0.71, .094),
+            nrow = 2, ncol = 2, byrow = TRUE, dimnames=list(class_names, class_names))
 ```
 
 ```{r}
-n_0 <- c(1000, 10, 10) # Initial abundance
+n_0 <- c(1000, 10) # Initial abundance
 pop <- pop.projection(A, n_0, iterations = 10) # Project the matrixpop
 stage.vector.plot(pop$stage.vector) # Plot each stage through time
 ```
@@ -39,8 +38,8 @@ stable.stage(A)
 
 ```{r}
 demog_sched <- data.frame(x = 0:2,
-                          sx = c(0.108, 0.71, 0.94),
+                          sx = c(0.1018, 0.71, 0.94),
                           mx = c(0,0,0.24))
-  make_Leslie_matrix(demog_sched, model = "pre")
+owl_matrix <- make_Leslie_matrix(demog_sched, model = "pre")
 ```
 
