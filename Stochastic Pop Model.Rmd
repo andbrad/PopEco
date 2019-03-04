@@ -1,0 +1,117 @@
+---
+title: "SEG & Ricker Lab"
+author: "Brad Anderson"
+date: "February 22, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(deSolve)
+library(ggplot2)
+library(zoo)
+
+```
+
+```{r}
+
+Ricker <- function(Time, vars, pars) {
+# (1) Extract the current value of the state variable (abundance)
+N_t <- vars[1]
+
+# (2) Extract the parameters
+r <- pars[1]
+K <- pars[2]
+
+# (3) Here's the actual model
+N_tp1 <- N_t * exp(r * (1 - N_t/K))
+
+# (4) Return the next value of the state variable, in a special format
+return(list(c(N_tp1)))
+}
+
+```
+
+```{r}
+Ricker(Time = 0, vars = 0, pars = c(log(1.1), 100))
+Ricker(Time = 0, vars = 0.01, pars = c(log(1.1), 100))
+Ricker(Time = 0, vars = 100, pars = c(log(1.1), 100))
+```
+
+```{r}
+# (1) Load the deSolve library
+library(deSolve)
+
+# (2) Set the parameter values
+r <- 0.9
+K <- 100
+
+# (3) Set the initial value of the state variable. The second line is
+# optional, it just makes the default plot look better
+N_0 <- 1
+names(N_0) <- "N"
+
+# (4) Set the time horizon
+t_h <- 20
+
+# (5) Use the "ode" function to do the iteration. The arguments are,
+  # in order:
+  # a. The intial value of the state variable (this will be the value
+  # of `vars` the first time the function gets called)
+  # b. A sequence of integers from 0 to t_h
+  # c. The name of the function to iterate
+  # d. The vector of parameters (this will be the value of `pars` when the
+  # function is called)
+  # e. A required control statement
+N_proj <- ode(N_0, 0:t_h, Ricker, c(r,K), method = "iteration")
+
+print(N_proj)
+```
+
+#SEG
+
+```{r}
+
+SEG <- function(Time, vars, pars) {
+  N_t <- vars[1]
+  mu <- pars[1]
+  sigma <- pars[2]
+  
+  r_t <- rnorm(1, mu, sigma)
+  N_tp1 <- N_t * exp(r_t)
+  
+  list(c(N_tp1))
+}
+
+nsims <- 100
+t_h <- 50
+mu <- 0.0458
+sigma <- 0.1266
+N_0 <- 39
+
+rep_SEG <- replicate(nsims, ode(N_0, 0:t_h, SEG, c(mu, sigma),
+method = "iteration")[,2])
+
+apply(rep_SEG, 1, mean)
+apply(rep_SEG, 1, var)
+apply(rep_SEG, 1, median)
+
+apply(rep_SEG, 1, quantile, probs = c(0.05, 0.95))
+
+apply(rep_SEG, 2, cummin)
+
+N_X <- 25
+apply(rep_SEG, 2, cummin) < N_X
+
+post_q_extinct <- apply(apply(rep_SEG, 2, cummin) < N_X, 1, mean)
+
+both <- cbind(pre_q_extinct, post_q_extinct)
+
+matplot(Time, both, type='l', ylab="simulated abundance")
+
+```
+
