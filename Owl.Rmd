@@ -13,37 +13,54 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(popbio)
 library(mpmtools)
+library(primer)
 ```
 
 ```{r}
 
-class_names <- c("Subadult", "Adult")
-A <- matrix(c(0, 0.024432,
-              0.71, .094),
-            nrow = 2, ncol = 2, byrow = TRUE, dimnames=list(class_names, class_names))
+#class_names <- c("Subadult", "Adult")
+#A <- matrix(c(0, 0.024432,
+  #            0.71, .094),
+  #          nrow = 2, ncol = 2, byrow = TRUE, dimnames=list(class_names, class_names))
+
+#n_0 <- c(1000, 10) # Initial abundance
+#pop <- pop.projection(A, n_0, iterations = 10) # Project the matrixpop
+#stage.vector.plot(pop$stage.vector) # Plot each stage through time
+
+#lambda(A)
+
+#stable.stage(A)
 ```
 
 ```{r}
-n_0 <- c(1000, 10) # Initial abundance
-pop <- pop.projection(A, n_0, iterations = 10) # Project the matrixpop
-stage.vector.plot(pop$stage.vector) # Plot each stage through time
-```
+class_names <- c("Juvenile", "Subadult", "Adult")
 
-```{r}
-lambda(A)
-
-stable.stage(A)
-```
-
-
-```{r}
 demog_sched <- data.frame(x = 0:3,
                           sx = c(0.11, 0.71, 0.942, 0.942),
                           mx = c(0,0,0,0.24))
 owl_matrix <- make_Leslie_matrix(demog_sched, model = "pre")
 
-owl_matrix
+rownames(owl_matrix) <- c("Juvenile", "Subadult", "Adult")
+colnames(owl_matrix) <- c("Juvenile", "Subadult", "Adult")
 
+owl_matrix
 lambda(owl_matrix)
+DemoInfo(owl_matrix)
+stable.stage(owl_matrix)
 ```
+
+```{r}
+n_0 <- c(100,250,1000) # Initial abundance
+owl_pop <- pop.projection(owl_matrix, n_0, iterations = 10) # Project the matrixpop
+stage.vector.plot(owl_pop$stage.vector) # Plot each stage through time
+```
+
+```{r}
+
+plot(owl_pop$pop.sizes)
+plot(owl_pop$pop.changes)
+
+```
+
+**b.	Increase egg/hatchling survival in the model, and re-calculate λ1. By how much does it increase? Experiment with different values of this survival term until you get an asymptotic growth rate of 1 or more. How large does egg survival need to be to achieve this? **
 
