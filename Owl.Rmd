@@ -98,23 +98,68 @@ If we increase dispersal from 0.18 to 0.6 we can get lambda >1.
 ```{r}
 
 #Dispersal coefficient
-D <- .18
+d <- .18
 #Newborn/feldging survival
-B <- 0.6
-#Adult survival
-A <- 0.942
+p0 <- 0.6
 #Subadult survival
-S <- 0.71
+p1 <- 0.71
+#Adult survival
+p2 <- 0.942
 #Fertility 
-F <- 0.24
+f <- 0.24
 
 
-owl_test <- matrix(c(0,    0, (F*B*D),
-                      S,    0,            0,
-                      0,    A,           A),
+owl_test <- matrix(c(0,    0, (f*p0*d),
+                      p1,    0,            0,
+                      0,    p2,           p2),
                     
 nrow = 3, ncol = 3, byrow = TRUE, dimnames = list(class_names, class_names))
 
 lambda(owl_test)
 
 ```
+
+```{r}
+## adapted from emperor goose example in Morris and Doak 2002.
+
+owl.vr<-list( d = .18, p0 = 0.6, p1 = 0.71, p2 = 0.942, f = 0.24)
+owl.el<-expression(0,    0, (f*p0*d),
+                      p1,    0,            0,
+                      0,    p2,           p2)
+
+
+## first plot effects of changing vital rates
+n<-length(owl.vr)
+vr<-seq(0,1,.1)
+vrsen<-matrix(numeric(n*length(vr)), ncol=n, dimnames=list(vr, names(owl.vr)))
+for (h in 1:n)
+{
+   owl.vr2<-list(  d = .18, p0 = 0.6, p1 = 0.71, p2 = 0.942, f = 0.24)
+   for (i in 1:length(vr))
+   {
+      owl.vr2[[h]]<-vr[i]
+      A<-matrix(sapply(owl.el, eval,owl.vr2 , NULL), nrow=sqrt(length(owl.el)), byrow=TRUE)
+      vrsen[i,h] <- max(Re(eigen(A)$values)) 
+   }
+}
+matplot(rownames(vrsen), vrsen, type='l', lwd=2, las=1,
+ylab="owl population growth", xlab="Value of vital rate",
+main="Effects of changing owl vital rates")
+vrn<-expression(d, p0, p1, p2, f)
+legend(.8, .4, vrn, lty=1:4, lwd=2, col=1:4, cex=1.2)
+
+## then calculate sensitivities  -- Table 9.1 
+
+x<-vitalsens(owl.el, owl.vr)
+x
+sum(x$elasticity)
+
+
+barplot(t(x[,2:3]), beside=TRUE, legend=TRUE, las=1, xlab="Vital rate",
+main="owl vital rate sensitivity and elasticity")
+abline(h=0)
+
+```
+
+Adult survival has an overwhelming effect on lambda.
+According to the sensitivity analysis the entire top right term looks more important, but the elasticities are all still equal.
