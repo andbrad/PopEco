@@ -10,6 +10,10 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r include=FALSE}
+# Install and load the package
+devtools::install_github("brucekendall/mpmtools")
+library(mpmtools)
+
 library(tidyverse)
 library(popbio)
 library(mpmtools)
@@ -36,7 +40,7 @@ library(primer)
 class_names <- c("Juvenile", "Subadult", "Adult")
 
 demog_sched <- data.frame(x = 0:3,
-                          sx = c(0.11, 0.71, 0.942, 0.942),
+                          sx = c(0.108, 0.71, 0.942, 0.942),
                           mx = c(0,0,0,0.24))
 owl_matrix <- make_Leslie_matrix(demog_sched, model = "pre")
 
@@ -64,3 +68,53 @@ plot(owl_pop$pop.changes)
 
 **b.	Increase egg/hatchling survival in the model, and re-calculate λ1. By how much does it increase? Experiment with different values of this survival term until you get an asymptotic growth rate of 1 or more. How large does egg survival need to be to achieve this? **
 
+
+```{r}
+
+#Dispersal coefficient
+D <- .18
+#Newborn/feldging survival
+B <- 0.6
+#Adult survival
+A <- 0.942
+#Subadult survival
+S <- 0.71
+#Fertility 
+F <- 0.24
+
+
+owl_mgmt <- matrix(c(0,    0, (F*B*D),
+                      S,    0,            0,
+                      0,    A,           A),
+                    
+nrow = 3, ncol = 3, byrow = TRUE, dimnames = list(class_names, class_names))
+
+lambda(owl_mgmt)
+
+```
+
+If we increase dispersal from 0.18 to 0.6 we can get lambda >1.
+
+```{r}
+
+#Dispersal coefficient
+D <- .18
+#Newborn/feldging survival
+B <- 0.6
+#Adult survival
+A <- 0.942
+#Subadult survival
+S <- 0.71
+#Fertility 
+F <- 0.24
+
+
+owl_test <- matrix(c(0,    0, (F*B*D),
+                      S,    0,            0,
+                      0,    A,           A),
+                    
+nrow = 3, ncol = 3, byrow = TRUE, dimnames = list(class_names, class_names))
+
+lambda(owl_test)
+
+```
